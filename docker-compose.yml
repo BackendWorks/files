@@ -1,0 +1,23 @@
+version: '3'
+services:
+  user:
+    build:
+      context: ./files
+    restart: 'no'
+    hostname: ${FILES_HOST}
+    ports:
+      - ${FILES_PORT}:${FILES_PORT}
+    env_file:
+      - ./.env
+      - ./user/.${NODE_ENV}.env
+    networks:
+      - backend
+    volumes:
+      - ./files/:/var/www/files
+      - /var/www/files/node_modules
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    links:
+      - mongodb
+      - rabbitmq
