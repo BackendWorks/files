@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { Files, FilesDocument } from './database/schema/files.schema';
+import { Files, FilesDocument } from './schemas/files.schema';
 import { S3 } from 'aws-sdk';
 import { ConfigService } from './config/config.service';
 import { GetPresignUrlDto } from './core/interfaces/GetPresignUrlDto';

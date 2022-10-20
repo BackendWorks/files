@@ -5,20 +5,26 @@ export type FilesDocument = Files & Document;
 
 @Schema()
 export class Files {
-  @Prop({ type: 'String' })
-  name: string;
+  @Prop({ type: 'String', required: true })
+  file_name: string;
 
-  @Prop({ type: 'String' })
+  @Prop({ type: 'String', required: true })
   link: string;
 
-  @Prop({ type: 'Number' })
-  user: number;
+  @Prop({ type: 'Number', required: true })
+  user_id: number;
 
   @Prop({ required: true })
-  createdAt: Date;
+  created_at: Date;
 
   @Prop()
-  deletedAt?: Date;
+  updated_at?: Date;
+
+  @Prop()
+  deleted_at?: Date;
+
+  @Prop()
+  is_deleted?: boolean;
 }
 
 export const FilesSchema = SchemaFactory.createForClass(Files);

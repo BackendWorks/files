@@ -12,7 +12,7 @@ export class ConfigService {
     this.config.presignExpire = process.env.AWS_EXPIRE_LINK;
     this.config.bucket = process.env.AWS_BUCKET;
     this.config.files_queue = process.env.RABBITMQ_FILES_QUEUE;
-    this.config.token_queue = process.env.RABBITMQ_TOKEN_QUEUE;
+    this.config.auth_queue = process.env.RABBITMQ_AUTH_QUEUE;
     this.config.env = process.env.NODE_ENV;
     this.config.aws = {
       accessKeyId: process.env.AWS_ACCESS_KEY,

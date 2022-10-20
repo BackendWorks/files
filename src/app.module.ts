@@ -7,20 +7,20 @@ import { AppService } from './app.service';
 import { ConfigModule } from './config/config.module';
 import { ConfigService } from './config/config.service';
 import { ClientAuthGuard } from './core/guards/auth.guard';
-import { Files, FilesSchema } from './database/schema/files.schema';
+import { Files, FilesSchema } from './schemas/files.schema';
 
 @Module({
   imports: [
     ConfigModule,
     ClientsModule.registerAsync([
       {
-        name: 'TOKEN_SERVICE',
+        name: 'AUTH_SERVICE',
         imports: [ConfigModule],
         useFactory: async (configService: ConfigService) => ({
           transport: Transport.RMQ,
           options: {
             urls: [`${configService.get('rb_url')}`],
-            queue: `${configService.get('token_queue')}`,
+            queue: `${configService.get('auth_queue')}`,
             queueOptions: {
               durable: false,
             },
@@ -34,7 +34,7 @@ import { Files, FilesSchema } from './database/schema/files.schema';
       useFactory: (configService: ConfigService) => ({
         uri: configService.get('database_uri'),
         useUnifiedTopology: true,
-        dbName: 'nest-files',
+        dbName: 'files',
       }),
       inject: [ConfigService],
     }),
