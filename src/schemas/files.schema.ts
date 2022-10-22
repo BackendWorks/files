@@ -8,11 +8,11 @@ export class Files {
   @Prop({ type: 'String', required: true })
   file_name: string;
 
-  @Prop({ type: 'String', required: true })
-  link: string;
-
   @Prop({ type: 'Number', required: true })
   user_id: number;
+
+  @Prop({ required: true })
+  key: string;
 
   @Prop({ required: true })
   created_at: Date;

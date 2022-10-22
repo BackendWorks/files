@@ -19,25 +19,40 @@ export class AppService {
     });
   }
 
-  async getPresgin(
+  async getPresginPutObject(
     params: GetPresignUrlDto,
     authUserId: number,
-  ): Promise<{ url: string }> {
+  ): Promise<{ url: string; id: number }> {
     try {
       const url = await this.fileService.getSignedUrlPromise('putObject', {
         Bucket: this.configService.get('bucket'),
-        Key: `${params.type}/${params.fileName}`,
+        Key: `${authUserId}/${params.type}/${Date.now()}_${params.fileName}`,
         Expires: Number(this.configService.get('presignExpire')),
       });
-      await this.filesModel.create({
+      const file = await this.filesModel.create({
         name: params.fileName,
-        link: `${params.type}/${params.fileName}`,
+        key: `${authUserId}/${params.type}/${Date.now()}_${params.fileName}`,
         createdAt: new Date(),
         user: authUserId,
       });
-      return {
-        url,
+      return { url, id: file._id };
+    } catch (e) {
+      this.logger.error(e);
+    }
+  }
+
+  async getPresignGetObject(fileId: number): Promise<{ url: string }> {
+    try {
+      const file = await this.filesModel.findById(fileId);
+      const params = {
+        Bucket: this.configService.get('bucket'),
+        Key: file.key,
       };
+      const url = await this.fileService.getSignedUrlPromise(
+        'getObject',
+        params,
+      );
+      return { url };
     } catch (e) {
       this.logger.error(e);
     }
