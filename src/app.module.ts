@@ -22,7 +22,7 @@ import { TerminusModule } from '@nestjs/terminus';
           transport: Transport.RMQ,
           options: {
             urls: [`${configService.get('rb_url')}`],
-            queue: `${configService.get('files_queue')}`,
+            queue: `${configService.get('auth_queue')}`,
             queueOptions: {
               durable: false,
             },

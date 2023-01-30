@@ -18,6 +18,7 @@ export class JwtAuthGuard {
 
   async canActivate(context: ExecutionContext) {
     const type = context.getType();
+    console.log(type);
     if (type === 'rpc') {
       return true;
     }
@@ -31,13 +32,14 @@ export class JwtAuthGuard {
     const request = context.switchToHttp().getRequest();
     let token = request.headers['authorization'];
     token = token.replace('Bearer ', '');
+    console.log(token);
+
     if (!token) {
       throw new UnauthorizedException();
     }
     const user = await firstValueFrom(
       this.authClient.send('get_user_from_token', JSON.stringify({ token })),
     );
-    console.log(user);
     if (!user) {
       throw new UnauthorizedException();
     }

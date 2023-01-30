@@ -1,23 +1,24 @@
-import { Controller, Get, Query } from '@nestjs/common';
-import { MessagePattern, Payload } from '@nestjs/microservices';
+import { Controller, Get, Param, Query, UseGuards } from '@nestjs/common';
 import { AppService } from './app.service';
-import { GetPresignUrlDto } from './core/dtos';
 import { CurrentUser } from './core/decorators';
+import { JwtAuthGuard, RolesGuard } from './core/guards';
 
 @Controller()
+@UseGuards(JwtAuthGuard)
+@UseGuards(RolesGuard)
 export class AppController {
   constructor(private readonly appService: AppService) {}
-
-  @MessagePattern('get_presign_object')
-  public async getPresignObject(@Payload() data: string) {
-    return this.appService.getPresignGetObject(data);
-  }
 
   @Get('/presign')
   getUserProfilePresign(
     @CurrentUser() authUserId: number,
-    @Query() params: GetPresignUrlDto,
-  ): Promise<{ url: string }> {
+    @Query() params: { name: string; type: string },
+  ): Promise<{ url: string; id: string }> {
     return this.appService.getPresginPutObject(params, authUserId);
+  }
+
+  @Get('/file')
+  getFilePresign(@Param() fileId: string): Promise<{ url: string }> {
+    return this.appService.getPresignGetObject(fileId);
   }
 }

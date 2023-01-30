@@ -1,14 +1,10 @@
 import { Controller, Get } from '@nestjs/common';
 import { Public } from './core/decorators';
 import { HealthCheck, HealthCheckService } from '@nestjs/terminus';
-import { PrismaService } from './core/services';
 
 @Controller('health')
 export class HealthController {
-  constructor(
-    private healthCheckService: HealthCheckService,
-    private prismaService: PrismaService,
-  ) {}
+  constructor(private healthCheckService: HealthCheckService) {}
 
   @Get()
   @HealthCheck()

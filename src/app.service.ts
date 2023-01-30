@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { S3 } from 'aws-sdk';
 import { ConfigService } from './config/config.service';
-import { GetPresignUrlDto } from './core/dtos';
 import { PrismaService } from './core/services';
 
 @Injectable()
@@ -17,19 +16,19 @@ export class AppService {
   }
 
   async getPresginPutObject(
-    params: GetPresignUrlDto,
+    params: { name: string; type: string },
     authUserId: number,
   ): Promise<{ url: string; id: string }> {
     try {
       const url = await this.s3.getSignedUrlPromise('putObject', {
         Bucket: this.configService.get('bucket'),
-        Key: `${authUserId}/${params.type}/${Date.now()}_${params.fileName}`,
+        Key: `${authUserId}/${params.type}/${Date.now()}_${params.name}`,
         Expires: Number(this.configService.get('presignExpire')),
       });
       const file = await this.prismaService.files.create({
         data: {
-          name: params.fileName,
-          key: `${authUserId}/${params.type}/${Date.now()}_${params.fileName}`,
+          name: params.name,
+          key: `${authUserId}/${params.type}/${Date.now()}_${params.name}`,
           user_id: authUserId,
         },
       });
