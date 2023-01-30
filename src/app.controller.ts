@@ -1,8 +1,8 @@
 import { Controller, Get, Query } from '@nestjs/common';
 import { MessagePattern, Payload } from '@nestjs/microservices';
 import { AppService } from './app.service';
-import { GetPresignUrlDto } from './core/interfaces/GetPresignUrlDto';
-import { CurrentUser } from './core/user.decorator';
+import { GetPresignUrlDto } from './core/dtos';
+import { CurrentUser } from './core/decorators';
 
 @Controller()
 export class AppController {
@@ -10,7 +10,7 @@ export class AppController {
 
   @MessagePattern('get_presign_object')
   public async getPresignObject(@Payload() data: string) {
-    return this.appService.getPresignGetObject(Number(data));
+    return this.appService.getPresignGetObject(data);
   }
 
   @Get('/presign')

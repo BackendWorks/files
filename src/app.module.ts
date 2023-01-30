@@ -1,17 +1,19 @@
 import { Module } from '@nestjs/common';
 import { APP_GUARD } from '@nestjs/core';
 import { ClientsModule, Transport } from '@nestjs/microservices';
-import { MongooseModule } from '@nestjs/mongoose';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ConfigModule } from './config/config.module';
 import { ConfigService } from './config/config.service';
-import { ClientAuthGuard } from './core/guards/auth.guard';
-import { Files, FilesSchema } from './schemas/files.schema';
+import { JwtAuthGuard } from './core/guards/auth.guard';
+import { PrismaService } from './core/services';
+import { HealthController } from './health.controller';
+import { TerminusModule } from '@nestjs/terminus';
 
 @Module({
   imports: [
     ConfigModule,
+    TerminusModule,
     ClientsModule.registerAsync([
       {
         name: 'AUTH_SERVICE',
@@ -20,7 +22,7 @@ import { Files, FilesSchema } from './schemas/files.schema';
           transport: Transport.RMQ,
           options: {
             urls: [`${configService.get('rb_url')}`],
-            queue: `${configService.get('auth_queue')}`,
+            queue: `${configService.get('files_queue')}`,
             queueOptions: {
               durable: false,
             },
@@ -29,23 +31,14 @@ import { Files, FilesSchema } from './schemas/files.schema';
         inject: [ConfigService],
       },
     ]),
-    MongooseModule.forRootAsync({
-      imports: [ConfigModule],
-      useFactory: (configService: ConfigService) => ({
-        uri: configService.get('database_uri'),
-        useUnifiedTopology: true,
-        dbName: 'files',
-      }),
-      inject: [ConfigService],
-    }),
-    MongooseModule.forFeature([{ name: Files.name, schema: FilesSchema }]),
   ],
-  controllers: [AppController],
+  controllers: [AppController, HealthController],
   providers: [
     AppService,
+    PrismaService,
     {
       provide: APP_GUARD,
-      useClass: ClientAuthGuard,
+      useClass: JwtAuthGuard,
     },
   ],
 })
