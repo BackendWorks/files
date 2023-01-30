@@ -1,13 +1,29 @@
+import { Injectable } from '@nestjs/common';
 import { config } from 'dotenv';
 config();
-import { Injectable } from '@nestjs/common';
+
+interface Config {
+  rb_url: string;
+  servicePort: string;
+  database_uri: string;
+  presignExpire: string;
+  bucket: string;
+  files_queue: string;
+  auth_queue: string;
+  env: string;
+  aws: {
+    accessKeyId: string;
+    secretAccessKey: string;
+    region: string;
+  };
+}
 
 @Injectable()
 export class ConfigService {
-  private config: { [key: string]: any } = {};
+  private config = {} as Config;
   constructor() {
     this.config.rb_url = process.env.RABBITMQ_URL;
-    this.config.servicePort = process.env.FILES_PORT;
+    this.config.servicePort = process.env.PORT;
     this.config.database_uri = process.env.FILES_MONGO_URI;
     this.config.presignExpire = process.env.AWS_EXPIRE_LINK;
     this.config.bucket = process.env.AWS_BUCKET;
@@ -21,7 +37,7 @@ export class ConfigService {
     };
   }
 
-  public get(key: string): any {
+  public get(key: keyof Config): any {
     return this.config[key];
   }
 }

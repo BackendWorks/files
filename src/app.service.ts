@@ -1,20 +1,17 @@
-import { Injectable, Logger } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import { Files, FilesDocument } from './schemas/files.schema';
+import { Injectable } from '@nestjs/common';
 import { S3 } from 'aws-sdk';
 import { ConfigService } from './config/config.service';
-import { GetPresignUrlDto } from './core/interfaces/GetPresignUrlDto';
+import { GetPresignUrlDto } from './core/dtos';
+import { PrismaService } from './core/services';
 
 @Injectable()
 export class AppService {
-  fileService: S3;
-  logger: Logger;
+  public s3: S3;
   constructor(
-    @InjectModel(Files.name) private filesModel: Model<FilesDocument>,
     private configService: ConfigService,
+    private prismaService: PrismaService,
   ) {
-    this.fileService = new S3({
+    this.s3 = new S3({
       ...this.configService.get('aws'),
     });
   }
@@ -22,39 +19,39 @@ export class AppService {
   async getPresginPutObject(
     params: GetPresignUrlDto,
     authUserId: number,
-  ): Promise<{ url: string; id: number }> {
+  ): Promise<{ url: string; id: string }> {
     try {
-      const url = await this.fileService.getSignedUrlPromise('putObject', {
+      const url = await this.s3.getSignedUrlPromise('putObject', {
         Bucket: this.configService.get('bucket'),
         Key: `${authUserId}/${params.type}/${Date.now()}_${params.fileName}`,
         Expires: Number(this.configService.get('presignExpire')),
       });
-      const file = await this.filesModel.create({
-        name: params.fileName,
-        key: `${authUserId}/${params.type}/${Date.now()}_${params.fileName}`,
-        createdAt: new Date(),
-        user: authUserId,
+      const file = await this.prismaService.files.create({
+        data: {
+          name: params.fileName,
+          key: `${authUserId}/${params.type}/${Date.now()}_${params.fileName}`,
+          user_id: authUserId,
+        },
       });
-      return { url, id: file._id };
+      return { url, id: file.id };
     } catch (e) {
-      this.logger.error(e);
+      console.log(e);
     }
   }
 
-  async getPresignGetObject(fileId: number): Promise<{ url: string }> {
+  async getPresignGetObject(fileId: string): Promise<{ url: string }> {
     try {
-      const file = await this.filesModel.findById(fileId);
+      const file = await this.prismaService.files.findUnique({
+        where: { id: fileId },
+      });
       const params = {
         Bucket: this.configService.get('bucket'),
         Key: file.key,
       };
-      const url = await this.fileService.getSignedUrlPromise(
-        'getObject',
-        params,
-      );
+      const url = await this.s3.getSignedUrlPromise('getObject', params);
       return { url };
     } catch (e) {
-      this.logger.error(e);
+      console.log(e);
     }
   }
 }
