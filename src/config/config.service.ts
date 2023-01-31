@@ -5,7 +5,7 @@ config();
 interface Config {
   rb_url: string;
   servicePort: string;
-  database_uri: string;
+  database_url: string;
   presignExpire: string;
   bucket: string;
   files_queue: string;
@@ -24,7 +24,7 @@ export class ConfigService {
   constructor() {
     this.config.rb_url = process.env.RABBITMQ_URL;
     this.config.servicePort = process.env.PORT;
-    this.config.database_uri = process.env.FILES_MONGO_URI;
+    this.config.database_url = process.env.DATABASE_URL;
     this.config.presignExpire = process.env.AWS_EXPIRE_LINK;
     this.config.bucket = process.env.AWS_BUCKET;
     this.config.files_queue = process.env.RABBITMQ_FILES_QUEUE;

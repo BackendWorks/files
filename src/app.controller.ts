@@ -17,8 +17,8 @@ export class AppController {
     return this.appService.getPresginPutObject(params, authUserId);
   }
 
-  @Get('/file')
-  getFilePresign(@Param() fileId: string): Promise<{ url: string }> {
-    return this.appService.getPresignGetObject(fileId);
+  @Get(':id')
+  getFilePresign(@Param() params): Promise<{ url: string }> {
+    return this.appService.getPresignGetObject(params.id);
   }
 }

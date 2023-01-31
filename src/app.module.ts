@@ -6,14 +6,23 @@ import { AppService } from './app.service';
 import { ConfigModule } from './config/config.module';
 import { ConfigService } from './config/config.service';
 import { JwtAuthGuard } from './core/guards/auth.guard';
-import { PrismaService } from './core/services';
 import { HealthController } from './health.controller';
 import { TerminusModule } from '@nestjs/terminus';
+import { MongooseModule } from '@nestjs/mongoose';
+import { File, FileSchema } from './app.schema';
 
 @Module({
   imports: [
     ConfigModule,
     TerminusModule,
+    MongooseModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: (configService: ConfigService) => ({
+        uri: configService.get('database_url'),
+      }),
+      inject: [ConfigService],
+    }),
+    MongooseModule.forFeature([{ name: File.name, schema: FileSchema }]),
     ClientsModule.registerAsync([
       {
         name: 'AUTH_SERVICE',
@@ -35,7 +44,6 @@ import { TerminusModule } from '@nestjs/terminus';
   controllers: [AppController, HealthController],
   providers: [
     AppService,
-    PrismaService,
     {
       provide: APP_GUARD,
       useClass: JwtAuthGuard,
