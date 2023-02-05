@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { S3 } from 'aws-sdk';
 import { ConfigService } from './config/config.service';
 import { File, FileDocument } from './app.schema';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 
 @Injectable()
@@ -19,27 +19,34 @@ export class AppService {
 
   async getPresginPutObject(
     params: { name: string; type: string },
-    authUserId: number,
-  ): Promise<{ url: string; id: string }> {
+    userId: number,
+  ) {
     try {
+      const key = `${userId}/${params.type}/${Date.now()}_${params.name}`;
       const url = await this.s3.getSignedUrlPromise('putObject', {
         Bucket: this.configService.get('bucket'),
-        Key: `${authUserId}/${params.type}/${Date.now()}_${params.name}`,
+        Key: key,
         Expires: Number(this.configService.get('presignExpire')),
       });
       const file = new this.fileModel({
         name: params.name,
-        key: `${authUserId}/${params.type}/${Date.now()}_${params.name}`,
-        user_id: authUserId,
+        type: params.type,
+        key,
+        user_id: userId,
       });
-      await file.save();
-      return { url, id: file.id };
+      const savedFile = await file.save();
+      return { url, fileId: savedFile.id };
     } catch (e) {
-      console.log(e);
+      throw e;
     }
   }
 
-  async getPresignGetObject(fileId: string): Promise<{ url: string }> {
+  async getPresignGetObject(fileId: string): Promise<{
+    url: string;
+    name: string;
+    created_at: Date;
+    id: Types.ObjectId;
+  }> {
     try {
       const file = await this.fileModel.findById(fileId);
       const params = {
@@ -47,9 +54,14 @@ export class AppService {
         Key: file.key,
       };
       const url = await this.s3.getSignedUrlPromise('getObject', params);
-      return { url };
+      return {
+        url,
+        name: file.name,
+        created_at: file.created_at,
+        id: file._id,
+      };
     } catch (e) {
-      console.log(e);
+      throw e;
     }
   }
 }

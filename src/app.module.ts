@@ -5,14 +5,27 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ConfigModule } from './config/config.module';
 import { ConfigService } from './config/config.service';
-import { JwtAuthGuard } from './core/guards/auth.guard';
+import { JwtAuthGuard } from './guards/auth.guard';
 import { HealthController } from './health.controller';
 import { TerminusModule } from '@nestjs/terminus';
 import { MongooseModule } from '@nestjs/mongoose';
 import { File, FileSchema } from './app.schema';
+import { LoggerModule } from 'nestjs-pino';
 
 @Module({
   imports: [
+    LoggerModule.forRoot({
+      ...(process.env.NODE_ENV === 'development' && {
+        pinoHttp: {
+          transport: {
+            target: 'pino-pretty',
+            options: {
+              singleLine: true,
+            },
+          },
+        },
+      }),
+    }),
     ConfigModule,
     TerminusModule,
     MongooseModule.forRootAsync({

@@ -14,6 +14,9 @@ export class File {
   @Prop()
   key: string;
 
+  @Prop()
+  type: string;
+
   @Prop({ default: now() })
   created_at: Date;
 

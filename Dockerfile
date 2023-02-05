@@ -16,6 +16,6 @@ COPY . .
 # COPY --from=builder /app/package*.json ./
 # COPY --from=builder /app/dist ./dist
 
-# EXPOSE 9002
+# EXPOSE 9003
 
 CMD [ "npm", "run", "dev" ]

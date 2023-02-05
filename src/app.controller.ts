@@ -1,7 +1,9 @@
-import { Controller, Get, Param, Query, UseGuards } from '@nestjs/common';
+import { Controller, Get, Query, UseGuards } from '@nestjs/common';
 import { AppService } from './app.service';
-import { CurrentUser } from './core/decorators';
-import { JwtAuthGuard, RolesGuard } from './core/guards';
+import { CurrentUser } from './decorators';
+import { JwtAuthGuard, RolesGuard } from './guards';
+import { MessagePattern, Payload } from '@nestjs/microservices';
+import { GetPresignDto } from './dtos';
 
 @Controller()
 @UseGuards(JwtAuthGuard)
@@ -10,15 +12,17 @@ export class AppController {
   constructor(private readonly appService: AppService) {}
 
   @Get('/presign')
-  getUserProfilePresign(
-    @CurrentUser() authUserId: number,
-    @Query() params: { name: string; type: string },
-  ): Promise<{ url: string; id: string }> {
-    return this.appService.getPresginPutObject(params, authUserId);
+  getPresignUrl(
+    @CurrentUser() userId: number,
+    @Query() params: GetPresignDto,
+  ): Promise<{ url: string }> {
+    return this.appService.getPresginPutObject(params, userId);
   }
 
-  @Get(':id')
-  getFilePresign(@Param() params): Promise<{ url: string }> {
-    return this.appService.getPresignGetObject(params.id);
+  @MessagePattern('get_file_by_fileid')
+  getFile(@Payload() data: string) {
+    const payload = JSON.parse(data);
+    console.log({ payload });
+    return this.appService.getPresignGetObject(payload.fileId);
   }
 }
