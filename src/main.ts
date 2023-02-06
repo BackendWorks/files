@@ -8,6 +8,7 @@ import { HttpExceptionFilter, ResponseInterceptor } from './interceptor';
 import { ExpressAdapter } from '@nestjs/platform-express';
 import { LoggerErrorInterceptor, Logger } from 'nestjs-pino';
 import * as express from 'express';
+import helmet from 'helmet';
 
 function configureSwagger(app): void {
   const config = new DocumentBuilder()
@@ -24,11 +25,14 @@ async function bootstrap() {
     AppModule,
     new ExpressAdapter(express()),
     {
+      logger: false,
       bufferLogs: true,
       cors: true,
     },
   );
-  app.useLogger(app.get(Logger));
+  const logger = app.get(Logger);
+  app.useLogger(logger);
+  app.use(helmet());
   const configService = app.get(ConfigService);
   const moduleRef = app.select(AppModule);
   const reflector = moduleRef.get(Reflector);
@@ -57,5 +61,6 @@ async function bootstrap() {
   });
   await app.startAllMicroservices();
   await app.listen(configService.get('servicePort'));
+  logger.log('🚀 Files service started successfully');
 }
 bootstrap();
