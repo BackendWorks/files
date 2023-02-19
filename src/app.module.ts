@@ -6,7 +6,6 @@ import { AppService } from './app.service';
 import { ConfigModule } from './config/config.module';
 import { ConfigService } from './config/config.service';
 import { JwtAuthGuard } from './guards/auth.guard';
-import { HealthController } from './health.controller';
 import { TerminusModule } from '@nestjs/terminus';
 import { MongooseModule } from '@nestjs/mongoose';
 import { File, FileSchema } from './app.schema';
@@ -54,7 +53,7 @@ import { LoggerModule } from 'nestjs-pino';
       },
     ]),
   ],
-  controllers: [AppController, HealthController],
+  controllers: [AppController],
   providers: [
     AppService,
     {
