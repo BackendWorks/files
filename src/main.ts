@@ -62,7 +62,9 @@ async function bootstrap() {
   await app.startAllMicroservices();
   await app.listen(configService.get('servicePort'));
   logger.log(
-    `🚀 Files service started successfully ${configService.get('servicePort')}`,
+    `🚀 Files service started successfully on port ${configService.get(
+      'servicePort',
+    )}`,
   );
 }
 bootstrap();
