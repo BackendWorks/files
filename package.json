@@ -28,7 +28,7 @@
     "@nestjs/terminus": "^9.1.4",
     "amqp-connection-manager": "^3.6.0",
     "amqplib": "^0.8.0",
-    "aws-sdk": "^2.1304.0",
+    "aws-sdk": "^2.1354.0",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.13.1",
     "dotenv": "^10.0.0",
