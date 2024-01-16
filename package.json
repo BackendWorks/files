@@ -36,7 +36,7 @@
     "express": "^4.18.2",
     "helmet": "^6.0.1",
     "mongoose": "^6.9.0",
-    "nestjs-i18n": "^9.2.3",
+    "nestjs-i18n": "^10.2.6",
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.2",
     "rxjs": "^7.2.0",

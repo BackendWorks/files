@@ -2,7 +2,7 @@ import configs from '../config';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { FilesService } from './services/file.service';
-import { FileSchema } from './schema/file.schema';
+import { File, FileSchema } from './schema/file.schema';
 import { MongooseModule } from '@nestjs/mongoose';
 
 @Module({
