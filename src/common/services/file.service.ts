@@ -1,12 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { S3 } from 'aws-sdk';
-import { ConfigService } from './config/config.service';
-import { File, FileDocument } from './app.schema';
+import { File, FileDocument } from '../schema/file.schema';
 import { Model, Types } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
-export class AppService {
+export class FilesService {
   public s3: S3;
   constructor(
     private configService: ConfigService,
@@ -32,7 +32,7 @@ export class AppService {
         name: params.name,
         type: params.type,
         key,
-        user_id: userId,
+        userId,
       });
       const savedFile = await file.save();
       return { url, fileId: savedFile.id };
@@ -44,7 +44,7 @@ export class AppService {
   async getPresignGetObject(fileId: string): Promise<{
     url: string;
     name: string;
-    created_at: Date;
+    createdAt: Date;
     id: Types.ObjectId;
   }> {
     try {
@@ -57,7 +57,7 @@ export class AppService {
       return {
         url,
         name: file.name,
-        created_at: file.created_at,
+        createdAt: file.createdAt,
         id: file._id,
       };
     } catch (e) {

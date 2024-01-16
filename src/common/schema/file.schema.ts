@@ -9,7 +9,7 @@ export class File {
   name: string;
 
   @Prop()
-  user_id: number;
+  userId: number;
 
   @Prop()
   key: string;
@@ -18,16 +18,16 @@ export class File {
   type: string;
 
   @Prop({ default: now() })
-  created_at: Date;
+  createdAt: Date;
 
   @Prop({ default: now() })
-  updated_at: Date;
+  updatedAt: Date;
 
   @Prop()
-  deleted_at?: Date;
+  deletedAt?: Date;
 
   @Prop()
-  is_deleted?: boolean;
+  isDeleted?: boolean;
 }
 
 export const FileSchema = SchemaFactory.createForClass(File);
