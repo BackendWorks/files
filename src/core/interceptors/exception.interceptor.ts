@@ -23,6 +23,7 @@ export class GlobalExceptionFilter implements ExceptionFilter {
         ? exception.getStatus()
         : HttpStatus.INTERNAL_SERVER_ERROR;
     const message = await i18n.t(`translation.${exception.message}`);
+    console.log(message);
 
     if (statusCode === HttpStatus.INTERNAL_SERVER_ERROR) {
       const error = {
