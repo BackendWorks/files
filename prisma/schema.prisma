@@ -16,7 +16,7 @@ datasource db {
 model Files {
   id         String    @id @default(auto()) @map("_id") @db.ObjectId
   fileName   String
-  userId     Int
+  userId     String
   storageKey String
   type       String
   createdAt  DateTime  @default(now())

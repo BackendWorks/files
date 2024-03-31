@@ -13,4 +13,5 @@ export interface GetPresignGetObjectResponse {
 export interface IAuthUser {
   id: string;
   role: string;
+  username: string;
 }
