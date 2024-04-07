@@ -10,7 +10,7 @@ import { PrismaService } from 'src/common/services/prisma.service';
 import {
   GetPresignGetObjectResponse,
   GetPresignPutObjectResponse,
-  Users,
+  IAuthUser,
 } from '../interfaces/file.interface';
 import { IFileService } from '../interfaces/file.service.interface';
 import { GetPresignPutObjectDto } from '../dtos/get.presign.dto';
@@ -33,7 +33,7 @@ export class FilesService implements IFileService {
 
   async getPresignPutObject(
     params: GetPresignPutObjectDto,
-    user: Users,
+    user: IAuthUser,
   ): Promise<GetPresignPutObjectResponse> {
     try {
       const key = `${user.id}_${user.username}/${Date.now()}_${params.name}`;
