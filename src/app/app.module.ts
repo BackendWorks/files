@@ -1,18 +1,17 @@
 import { Module } from '@nestjs/common';
+import configs from '../config';
+import { join } from 'path';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { AppController } from './app.controller';
 import { TerminusModule } from '@nestjs/terminus';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { CoreModule } from 'src/core/core.module';
-import { CommonModule } from 'src/common/common.module';
 import { AcceptLanguageResolver, I18nModule, QueryResolver } from 'nestjs-i18n';
-import { join } from 'path';
 import { FilesModule } from 'src/modules/files/files.module';
 
 @Module({
   imports: [
     CoreModule,
-    CommonModule,
     TerminusModule,
     FilesModule,
     ClientsModule.registerAsync([
@@ -32,6 +31,13 @@ import { FilesModule } from 'src/modules/files/files.module';
         inject: [ConfigService],
       },
     ]),
+    ConfigModule.forRoot({
+      load: configs,
+      isGlobal: true,
+      cache: true,
+      envFilePath: ['.env'],
+      expandVariables: true,
+    }),
     I18nModule.forRoot({
       fallbackLanguage: 'en',
       loaderOptions: {

@@ -1,17 +1,12 @@
-export interface GetPresignPutObjectResponse {
+export interface IGetPresignPutObjectResponse {
   url: string;
-  fileId: string;
-}
-
-export interface GetPresignGetObjectResponse {
-  url: string;
-  name: string;
-  createdAt: Date;
-  id: string;
+  storageKey: string;
+  fileName: string;
 }
 
 export interface IAuthUser {
   id: string;
   role: string;
   username: string;
+  email: string;
 }

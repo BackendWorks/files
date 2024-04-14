@@ -22,6 +22,7 @@
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.535.0",
+    "@faker-js/faker": "^8.4.1",
     "@nestjs/common": "^8.0.0",
     "@nestjs/config": "^3.1.1",
     "@nestjs/core": "^8.0.0",
@@ -33,13 +34,13 @@
     "@prisma/client": "^5.11.0",
     "amqp-connection-manager": "^3.6.0",
     "amqplib": "^0.8.0",
-    "aws-sdk": "^2.1304.0",
     "bson": "^6.5.0",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.13.1",
     "dotenv": "^10.0.0",
     "express": "^4.18.2",
     "helmet": "^6.0.1",
+    "jest-junit": "^16.0.0",
     "mongoose": "^6.9.0",
     "nestjs-i18n": "^10.2.6",
     "reflect-metadata": "^0.1.13",
@@ -87,17 +88,7 @@
     "singleQuote": true,
     "trailingComma": "all",
     "useTabs": false,
-    "tabWidth": 2,
-    "overrides": [
-      {
-        "files": "*.yml",
-        "options": {
-          "tadWidth": 2,
-          "printWidth": 40,
-          "singleQuote": true
-        }
-      }
-    ]
+    "tabWidth": 2
   },
   "jest": {
     "moduleFileExtensions": [
@@ -127,7 +118,7 @@
     ]
   },
   "lint-staged": {
-    "*.{js,ts}": "npm run lint:fix",
+    "*.{js,ts}": "yarn lint:fix",
     "*.{ts,js,json,md}": "prettier --write"
   }
 }
