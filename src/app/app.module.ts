@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { AppController } from './app.controller';
 import { TerminusModule } from '@nestjs/terminus';
@@ -12,6 +12,7 @@ import { AuthGuard } from 'src/guards/auth.guard';
 import { RolesGuard } from 'src/guards/roles.guard';
 import { ResponseInterceptor } from 'src/interceptors/response.interceptor';
 import { GlobalExceptionFilter } from 'src/interceptors/exception.interceptor';
+import { LoggingMiddleware } from 'src/middlewares/logging.middleware';
 
 @Module({
   imports: [
@@ -67,4 +68,8 @@ import { GlobalExceptionFilter } from 'src/interceptors/exception.interceptor';
     },
   ],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer): void {
+    consumer.apply(LoggingMiddleware).forRoutes('*');
+  }
+}
