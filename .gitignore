@@ -38,3 +38,5 @@ lerna-debug.log*
 .env.*
 !.env.docker
 !.env.local
+
+junit.xml

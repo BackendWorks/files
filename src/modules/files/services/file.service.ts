@@ -6,7 +6,7 @@ import {
 } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { ConfigService } from '@nestjs/config';
-import { PrismaService } from 'src/common/services/prisma.service';
+import { PrismaService } from '../../../common/services/prisma.service';
 import {
   GetPresignGetObjectResponse,
   GetPresignPutObjectResponse,

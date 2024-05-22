@@ -1,3 +1,4 @@
 {
-  "fileNotFound": "File id does not exist"
+  "fileNotFound": "File id does not exist.",
+  "internalServerError": "Internal server error."
 }

@@ -1,9 +1,11 @@
 import { Controller, Get, Param, Query } from '@nestjs/common';
-import { AuthUser } from 'src/core/decorators/auth.user.decorator';
+import { AuthUser } from 'src/decorators/auth.user.decorator';
 import { FilesService } from '../services/file.service';
 import { GetPresignPutObjectDto } from '../dtos/get.presign.dto';
 import { IAuthUser } from '../interfaces/file.interface';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('files')
 @Controller({
   path: '/files',
   version: '1',

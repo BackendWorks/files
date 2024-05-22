@@ -11,7 +11,8 @@ export interface GetPresignGetObjectResponse {
 }
 
 export interface IAuthUser {
-  id: string;
+  id: number;
   role: string;
   username: string;
+  device_token: string;
 }

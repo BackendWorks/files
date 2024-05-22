@@ -3,15 +3,18 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
 import { AppController } from './app.controller';
 import { TerminusModule } from '@nestjs/terminus';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { CoreModule } from 'src/core/core.module';
 import { CommonModule } from 'src/common/common.module';
 import { AcceptLanguageResolver, I18nModule, QueryResolver } from 'nestjs-i18n';
 import { join } from 'path';
 import { FilesModule } from 'src/modules/files/files.module';
+import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
+import { AuthGuard } from 'src/guards/auth.guard';
+import { RolesGuard } from 'src/guards/roles.guard';
+import { ResponseInterceptor } from 'src/interceptors/response.interceptor';
+import { GlobalExceptionFilter } from 'src/interceptors/exception.interceptor';
 
 @Module({
   imports: [
-    CoreModule,
     CommonModule,
     TerminusModule,
     FilesModule,
@@ -45,5 +48,23 @@ import { FilesModule } from 'src/modules/files/files.module';
     }),
   ],
   controllers: [AppController],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: AuthGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: RolesGuard,
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: ResponseInterceptor,
+    },
+    {
+      provide: APP_FILTER,
+      useClass: GlobalExceptionFilter,
+    },
+  ],
 })
 export class AppModule {}
