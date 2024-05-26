@@ -18,9 +18,9 @@ export class FilesController {
   constructor(private readonly fileService: FilesService) {}
 
   @ApiBearerAuth('accessToken')
-  @Post()
   @AllowedRoles(['User', 'Admin'])
   @Serialize(FileResponseDto)
+  @Post()
   createFile(
     @AuthUser() user: IAuthUser,
     @Body() data: CreateFileDto,
