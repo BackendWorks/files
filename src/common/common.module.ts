@@ -4,7 +4,6 @@ import { ConfigModule } from '@nestjs/config';
 import { PrismaService } from './services/prisma.service';
 
 @Module({
-  controllers: [],
   imports: [
     ConfigModule.forRoot({
       load: configs,

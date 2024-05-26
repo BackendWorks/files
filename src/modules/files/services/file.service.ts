@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import {
   S3Client,
   PutObjectCommand,
@@ -7,21 +7,27 @@ import {
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { ConfigService } from '@nestjs/config';
 import { PrismaService } from '../../../common/services/prisma.service';
-import {
-  GetPresignGetObjectResponse,
-  GetPresignPutObjectResponse,
-  IAuthUser,
-} from '../interfaces/file.interface';
+import { IAuthUser } from '../interfaces/file.interface';
 import { IFileService } from '../interfaces/file.service.interface';
-import { GetPresignPutObjectDto } from '../dtos/get.presign.dto';
+import { GetPresignPutObjectDto } from '../dtos/put.presign.dto';
+import { GetPresignPutObjectResponseDto } from '../dtos/put.presign.response.dto';
+import { GetPresignGetObjectResponseDto } from '../dtos/get.presign.response.dto';
+import { CreateFileDto } from '../dtos/create.file.dto';
+import { FileResponseDto } from '../dtos/file.response.dto';
+import { firstValueFrom } from 'rxjs';
+import { ClientProxy } from '@nestjs/microservices';
+import { plainToInstance } from 'class-transformer';
+import { UserResponseDto } from '../dtos/user.response.dto';
 
 @Injectable()
 export class FilesService implements IFileService {
   public s3Client: S3Client;
   constructor(
+    @Inject('AUTH_SERVICE') private readonly authClient: ClientProxy,
     private readonly configService: ConfigService,
     private readonly prismaService: PrismaService,
   ) {
+    this.authClient.connect();
     this.s3Client = new S3Client({
       region: this.configService.get('aws.region'),
       credentials: {
@@ -31,29 +37,43 @@ export class FilesService implements IFileService {
     });
   }
 
+  async createFile(
+    userId: number,
+    data: CreateFileDto,
+  ): Promise<FileResponseDto> {
+    const { fileName, fileType, storageKey, storagePath } = data;
+    const file = await this.prismaService.files.create({
+      data: {
+        fileName,
+        fileType,
+        storageKey,
+        storagePath,
+        userId,
+      },
+    });
+    const userResponse = await firstValueFrom(
+      this.authClient.send('getUserById', JSON.stringify({ userId })),
+    );
+    const user = plainToInstance(UserResponseDto, userResponse);
+    return { ...file, author: user };
+  }
+
   async getPresignPutObject(
-    params: GetPresignPutObjectDto,
-    user: IAuthUser,
-  ): Promise<GetPresignPutObjectResponse> {
+    { fileName, contentType }: GetPresignPutObjectDto,
+    { id: userId }: IAuthUser,
+  ): Promise<GetPresignPutObjectResponseDto> {
     try {
-      const key = `${user.id}_${user.username}/${Date.now()}_${params.name}`;
+      const storageKey = `${Date.now()}_${fileName}`;
+      const storagePath = `${userId}/${storageKey}`;
       const command = new PutObjectCommand({
         Bucket: this.configService.get('bucket'),
-        Key: key,
-        ContentType: params.type,
+        Key: storagePath,
+        ContentType: contentType,
       });
       const url = await getSignedUrl(this.s3Client, command, {
         expiresIn: Number(this.configService.get('presignExpire')),
       });
-      const file = await this.prismaService.files.create({
-        data: {
-          fileName: params.name,
-          type: params.type,
-          storageKey: key,
-          userId: user.id,
-        },
-      });
-      return { url, fileId: file.id };
+      return { url, storageKey, storagePath };
     } catch (e) {
       throw e;
     }
@@ -61,7 +81,7 @@ export class FilesService implements IFileService {
 
   async getPresignGetObject(
     fileId: string,
-  ): Promise<GetPresignGetObjectResponse> {
+  ): Promise<GetPresignGetObjectResponseDto> {
     try {
       const file = await this.prismaService.files.findUnique({
         where: {
@@ -73,16 +93,13 @@ export class FilesService implements IFileService {
       }
       const command = new GetObjectCommand({
         Bucket: this.configService.get('bucket'),
-        Key: file.storageKey,
+        Key: file.storagePath,
       });
       const url = await getSignedUrl(this.s3Client, command, {
         expiresIn: Number(this.configService.get('presignExpire')),
       });
       return {
         url,
-        name: file.fileName,
-        createdAt: file.createdAt,
-        id: file.id,
       };
     } catch (e) {
       throw e;

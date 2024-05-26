@@ -9,10 +9,10 @@ import { join } from 'path';
 import { FilesModule } from 'src/modules/files/files.module';
 import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { AuthGuard } from 'src/guards/auth.guard';
-import { RolesGuard } from 'src/guards/roles.guard';
 import { ResponseInterceptor } from 'src/interceptors/response.interceptor';
 import { GlobalExceptionFilter } from 'src/interceptors/exception.interceptor';
 import { LoggingMiddleware } from 'src/middlewares/logging.middleware';
+import { PermissionsGuard } from 'src/guards/permission.guard';
 
 @Module({
   imports: [
@@ -56,7 +56,7 @@ import { LoggingMiddleware } from 'src/middlewares/logging.middleware';
     },
     {
       provide: APP_GUARD,
-      useClass: RolesGuard,
+      useClass: PermissionsGuard,
     },
     {
       provide: APP_INTERCEPTOR,
