@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { FileType } from '@prisma/client';
+import { AllowedFileType } from '@prisma/client';
 import { IsEnum, IsNotEmpty, IsString } from 'class-validator';
 
 export class CreateFileDto {
@@ -20,21 +20,14 @@ export class CreateFileDto {
   @ApiProperty({
     example: 'PNG',
   })
-  @IsEnum(FileType)
+  @IsEnum(AllowedFileType)
   @IsNotEmpty({ message: 'fileType is required' })
-  fileType: FileType;
+  fileType: AllowedFileType;
 
   @ApiProperty({
-    example: `${Date.now()}_filename.png`,
+    example: `bucket/${Date.now()}_filename.png`,
   })
   @IsString()
   @IsNotEmpty({ message: 'storageKey is required' })
   storageKey: string;
-
-  @ApiProperty({
-    example: `userId/${Date.now()}_filename.png`,
-  })
-  @IsString()
-  @IsNotEmpty({ message: 'storagePath is required' })
-  storagePath: string;
 }

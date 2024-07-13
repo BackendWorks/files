@@ -1,13 +1,13 @@
 import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
-import { FilesService } from '../services/file.service';
-import { GetPresignPutObjectDto } from '../dtos/put.presign.dto';
-import { IAuthUser } from '../interfaces/file.interface';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { AuthUser } from 'src/decorators/auth.decorator';
-import { Serialize } from 'src/decorators/serialize.decorator';
-import { FileResponseDto } from '../dtos/file.response.dto';
-import { CreateFileDto } from '../dtos/create.file.dto';
 import { AllowedRoles } from 'src/decorators/roles.decorator';
+
+import { FilesService } from '../services/file.service';
+import { GetPresignPutObjectDto } from '../dtos/file.presign.put.dto';
+import { IAuthUser } from '../interfaces/file.interface';
+import { FileResponseDto } from '../dtos/file.response.dto';
+import { CreateFileDto } from '../dtos/file.create.dto';
 
 @ApiTags('files')
 @Controller({
@@ -19,7 +19,6 @@ export class FilesController {
 
   @ApiBearerAuth('accessToken')
   @AllowedRoles(['User', 'Admin'])
-  @Serialize(FileResponseDto)
   @Post()
   createFile(
     @AuthUser() user: IAuthUser,
@@ -29,7 +28,7 @@ export class FilesController {
   }
 
   @ApiBearerAuth('accessToken')
-  @Get('/put-presign')
+  @Get('/presign/put')
   putPresignUrl(
     @AuthUser() user: IAuthUser,
     @Query() params: GetPresignPutObjectDto,
@@ -38,7 +37,7 @@ export class FilesController {
   }
 
   @ApiBearerAuth('accessToken')
-  @Get('/get-presign/:id')
+  @Get('/presign/get/:id')
   getPresignUrl(@Param('id') fileId: string) {
     return this.fileService.getPresignGetObject(fileId);
   }

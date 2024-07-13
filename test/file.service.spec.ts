@@ -3,13 +3,14 @@ import { ConfigService } from '@nestjs/config';
 import { ClientProxy } from '@nestjs/microservices';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { NotFoundException } from '@nestjs/common';
-import { FilesService } from '../../../src/modules/files/services/file.service';
-import { PrismaService } from '../../../src/common/services/prisma.service';
-import { CreateFileDto } from '../../../src/modules/files/dtos/create.file.dto';
-import { FileType, Files } from '@prisma/client';
+import { AllowedFileType, Files } from '@prisma/client';
 import { of } from 'rxjs';
 import { plainToInstance } from 'class-transformer';
-import { UserResponseDto } from '../../../src/modules/files/dtos/user.response.dto';
+
+import { FilesService } from '../src/modules/files/services/file.service';
+import { PrismaService } from '../src/common/services/prisma.service';
+import { CreateFileDto } from '../src/modules/files/dtos/file.create.dto';
+import { UserResponseDto } from '../src/modules/files/dtos/user.response.dto';
 
 jest.mock('@aws-sdk/s3-request-presigner');
 
@@ -75,9 +76,8 @@ describe('FilesService', () => {
     it('should create a file and return the file response', async () => {
       const createFileDto = {
         fileName: 'testFile.jpg',
-        fileType: FileType.JPG,
+        fileType: AllowedFileType.JPG,
         storageKey: 'some-key',
-        storagePath: 'some/path',
       } as CreateFileDto;
       const userId = 1;
 
@@ -106,9 +106,8 @@ describe('FilesService', () => {
     it('should handle errors during file creation', async () => {
       const createFileDto = {
         fileName: 'testFile.txt',
-        fileType: FileType.JPG,
+        fileType: AllowedFileType.JPG,
         storageKey: 'some-key',
-        storagePath: 'some/path',
       } as CreateFileDto;
       const userId = 1;
 
@@ -141,7 +140,6 @@ describe('FilesService', () => {
       expect(result).toEqual({
         url: presignedUrl,
         storageKey: expect.any(String),
-        storagePath: expect.any(String),
       });
     });
 

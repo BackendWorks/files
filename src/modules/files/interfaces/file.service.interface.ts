@@ -1,6 +1,6 @@
-import { GetPresignPutObjectDto } from '../dtos/put.presign.dto';
-import { GetPresignGetObjectResponseDto } from '../dtos/get.presign.response.dto';
-import { GetPresignPutObjectResponseDto } from '../dtos/put.presign.response.dto';
+import { GetPresignPutObjectDto } from '../dtos/file.presign.put.dto';
+import { GetPresignGetObjectResponseDto } from '../dtos/file.presign.get.response.dto';
+import { GetPresignPutObjectResponseDto } from '../dtos/file.presign.put.response.dto';
 import { IAuthUser } from './file.interface';
 
 export interface IFileService {

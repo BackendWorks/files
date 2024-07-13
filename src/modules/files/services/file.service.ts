@@ -6,17 +6,18 @@ import {
 } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { ConfigService } from '@nestjs/config';
-import { PrismaService } from '../../../common/services/prisma.service';
-import { IAuthUser } from '../interfaces/file.interface';
-import { IFileService } from '../interfaces/file.service.interface';
-import { GetPresignPutObjectDto } from '../dtos/put.presign.dto';
-import { GetPresignPutObjectResponseDto } from '../dtos/put.presign.response.dto';
-import { GetPresignGetObjectResponseDto } from '../dtos/get.presign.response.dto';
-import { CreateFileDto } from '../dtos/create.file.dto';
-import { FileResponseDto } from '../dtos/file.response.dto';
 import { firstValueFrom } from 'rxjs';
 import { ClientProxy } from '@nestjs/microservices';
 import { plainToInstance } from 'class-transformer';
+
+import { PrismaService } from '../../../common/services/prisma.service';
+import { IAuthUser } from '../interfaces/file.interface';
+import { IFileService } from '../interfaces/file.service.interface';
+import { GetPresignPutObjectDto } from '../dtos/file.presign.put.dto';
+import { GetPresignPutObjectResponseDto } from '../dtos/file.presign.put.response.dto';
+import { GetPresignGetObjectResponseDto } from '../dtos/file.presign.get.response.dto';
+import { CreateFileDto } from '../dtos/file.create.dto';
+import { FileResponseDto } from '../dtos/file.response.dto';
 import { UserResponseDto } from '../dtos/user.response.dto';
 
 @Injectable()
@@ -41,13 +42,12 @@ export class FilesService implements IFileService {
     userId: number,
     data: CreateFileDto,
   ): Promise<FileResponseDto> {
-    const { fileName, fileType, storageKey, storagePath } = data;
+    const { fileName, fileType, storageKey } = data;
     const file = await this.prismaService.files.create({
       data: {
         fileName,
         fileType,
         storageKey,
-        storagePath,
         userId,
       },
     });
@@ -63,17 +63,16 @@ export class FilesService implements IFileService {
     { id: userId }: IAuthUser,
   ): Promise<GetPresignPutObjectResponseDto> {
     try {
-      const storageKey = `${Date.now()}_${fileName}`;
-      const storagePath = `${userId}/${storageKey}`;
+      const storageKey = `${userId}/${Date.now()}_${fileName}`;
       const command = new PutObjectCommand({
         Bucket: this.configService.get('bucket'),
-        Key: storagePath,
+        Key: storageKey,
         ContentType: contentType,
       });
       const url = await getSignedUrl(this.s3Client, command, {
         expiresIn: Number(this.configService.get('presignExpire')),
       });
-      return { url, storageKey, storagePath };
+      return { url, storageKey };
     } catch (e) {
       throw e;
     }
@@ -93,7 +92,7 @@ export class FilesService implements IFileService {
       }
       const command = new GetObjectCommand({
         Bucket: this.configService.get('bucket'),
-        Key: file.storagePath,
+        Key: file.storageKey,
       });
       const url = await getSignedUrl(this.s3Client, command, {
         expiresIn: Number(this.configService.get('presignExpire')),

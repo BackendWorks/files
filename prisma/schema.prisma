@@ -14,23 +14,23 @@ datasource db {
 }
 
 model Files {
-  id          String    @id @default(auto()) @map("_id") @db.ObjectId
-  fileName    String
-  userId      Int
-  storageKey  String
-  storagePath String
-  fileType    FileType
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  deletedAt   DateTime?
-  isDeleted   Boolean   @default(false)
+  id         String          @id @default(auto()) @map("_id") @db.ObjectId
+  fileName   String
+  userId     Int
+  storageKey String
+  fileType   AllowedFileType
+  createdAt  DateTime        @default(now())
+  updatedAt  DateTime        @updatedAt
+  deletedAt  DateTime?
+  isDeleted  Boolean         @default(false)
 }
 
-enum FileType {
+enum AllowedFileType {
   JPG
   JPEG
   PNG
   MP4
   MP3
   WAV
+  PDF
 }
