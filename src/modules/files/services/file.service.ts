@@ -65,7 +65,7 @@ export class FilesService implements IFileService {
     try {
       const storageKey = `${userId}/${Date.now()}_${fileName}`;
       const command = new PutObjectCommand({
-        Bucket: this.configService.get('bucket'),
+        Bucket: this.configService.get('aws.bucket'),
         Key: storageKey,
         ContentType: contentType,
       });
@@ -88,10 +88,10 @@ export class FilesService implements IFileService {
         },
       });
       if (!file) {
-        throw new NotFoundException('fileNotFound');
+        throw new NotFoundException('file.fileNotFound');
       }
       const command = new GetObjectCommand({
-        Bucket: this.configService.get('bucket'),
+        Bucket: this.configService.get('aws.bucket'),
         Key: file.storageKey,
       });
       const url = await getSignedUrl(this.s3Client, command, {

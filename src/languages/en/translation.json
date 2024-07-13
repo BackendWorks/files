@@ -1,6 +1,0 @@
-{
-  "fileNotFound": "File id does not exist.",
-  "accessTokenUnauthorized": "Access token is not authorized.",
-  "internalServerError": "Internal server error.",
-  "notHaveEnoughPermissions": "You do not have permission to execute this operation."
-}
